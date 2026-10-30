@@ -1,5 +1,6 @@
 import React from 'react';
-import { Library, Heart, ShieldCheck, Database, Layers } from 'lucide-react';
+import { BiblioBoxLogo } from './BiblioBoxLogo';
+import { Heart, ShieldCheck, Database, Layers } from 'lucide-react';
 
 export function Footer() {
   return (
@@ -8,9 +9,8 @@ export function Footer() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-cream-800/70 dark:text-slate-400">
           
           <div className="flex items-center gap-2">
-            <Library className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-            <span className="font-semibold text-cream-900 dark:text-slate-200">BiblioBox</span>
-            <span>— Personal Movie & Book Library</span>
+            <BiblioBoxLogo className="w-5 h-5" showText={true} textClassName="text-sm font-semibold" />
+            <span className="text-cream-800/60 dark:text-slate-400">— Personal Movie & Book Library</span>
           </div>
 
           <div className="flex items-center gap-4 flex-wrap justify-center">

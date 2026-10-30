@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { BiblioBoxLogo } from './BiblioBoxLogo';
 import { 
   BookOpen, 
   Film, 
@@ -31,13 +32,8 @@ export function Navbar({ onOpenAddModal }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         
         {/* Brand / Logo */}
-        <Link to="/" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-amber-600 flex items-center justify-center text-white">
-            <Library className="w-4 h-4" />
-          </div>
-          <span className="font-display text-lg font-bold tracking-tight text-cream-900 dark:text-white">
-            BiblioBox
-          </span>
+        <Link to="/" className="flex items-center group">
+          <BiblioBoxLogo className="w-8 h-8" showText={true} textClassName="text-lg" />
         </Link>
 
         {/* Navigation Links */}

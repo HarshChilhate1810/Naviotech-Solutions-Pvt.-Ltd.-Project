@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
-import { Library, Sun, Moon } from 'lucide-react';
+import { BiblioBoxLogo } from '../components/BiblioBoxLogo';
+import { Sun, Moon } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
 export function AuthLayout() {
@@ -26,13 +27,8 @@ export function AuthLayout() {
 
       {/* Header Logo */}
       <div className="mb-6 flex flex-col items-center text-center">
-        <Link to="/" className="flex items-center gap-2.5 group mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-600 to-amber-400 flex items-center justify-center text-white shadow-lg shadow-amber-600/30 group-hover:scale-105 transition-transform duration-200">
-            <Library className="w-6 h-6" />
-          </div>
-          <span className="font-display text-2xl font-bold tracking-tight text-cream-900 dark:text-white">
-            BiblioBox
-          </span>
+        <Link to="/" className="flex flex-col items-center gap-2 group mb-2">
+          <BiblioBoxLogo className="w-16 h-16" showText={true} textClassName="text-2xl" />
         </Link>
         <p className="text-xs text-cream-800/60 dark:text-slate-400 max-w-xs">
           Your personal cloud-synchronized movie & book sanctuary
