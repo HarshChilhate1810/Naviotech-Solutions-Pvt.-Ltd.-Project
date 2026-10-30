@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, UserPlus, ShieldCheck } from 'lucide-react';
+import { Mail, Lock, User, UserPlus, ShieldCheck, Smartphone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export function RegisterPage() {
@@ -9,6 +9,7 @@ export function RegisterPage() {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,10 +37,10 @@ export function RegisterPage() {
     try {
       setLoading(true);
       setError('');
-      await register(name.trim(), email.trim(), password);
+      await register(name.trim(), email.trim(), password, phone.trim() || null);
       navigate('/');
     } catch (err) {
-      setError(err.message || 'Registration failed. This email may already be in use.');
+      setError(err.message || 'Registration failed. This email or mobile number may already be in use.');
     } finally {
       setLoading(false);
     }
@@ -101,6 +102,29 @@ export function RegisterPage() {
           </div>
         </div>
 
+        {/* Mobile Number (Optional / Recommended for Mobile Login) */}
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="text-xs font-semibold uppercase tracking-wider text-cream-800/70 dark:text-slate-300">
+              Mobile Number
+            </label>
+            <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">For Mobile & OTP Login</span>
+          </div>
+          <div className="relative flex">
+            <span className="inline-flex items-center px-3 rounded-l-xl bg-cream-100 dark:bg-navy-800 border border-r-0 border-cream-200 dark:border-navy-700 text-xs font-bold text-cream-800 dark:text-slate-200">
+              +91
+            </span>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="98765 43210 (Optional)"
+              maxLength={15}
+              className="w-full px-3.5 py-2.5 rounded-r-xl bg-cream-50 dark:bg-navy-950 border border-cream-200 dark:border-navy-700 text-sm font-mono tracking-wider text-cream-900 dark:text-white placeholder:font-sans placeholder:tracking-normal placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all"
+            />
+          </div>
+        </div>
+
         {/* Password */}
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wider text-cream-800/70 dark:text-slate-300 mb-1.5">
@@ -158,7 +182,7 @@ export function RegisterPage() {
       </form>
 
       {/* Footer link to login */}
-      <div className="mt-6 text-center">
+      <div className="mt-6 pt-5 border-t border-cream-100 dark:border-navy-800 text-center">
         <p className="text-xs text-cream-800/70 dark:text-slate-400">
           Already have an account?{' '}
           <Link

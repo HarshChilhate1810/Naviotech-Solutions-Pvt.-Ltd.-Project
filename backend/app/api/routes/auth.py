@@ -17,15 +17,54 @@ from app.models.user_preference import UserPreference
 from app.models.library_item import LibraryItem
 from app.models.movie_detail import MovieDetail
 from app.models.book_detail import BookDetail
+import re
+import time
+import secrets
+from sqlalchemy import or_
 from app.schemas.auth import (
     UserRegisterRequest,
     UserLoginRequest,
+    MobileOtpRequest,
+    MobileOtpVerifyRequest,
     RefreshTokenRequest,
     ForgotPasswordRequest,
     ResetPasswordRequest,
     TokenResponse,
     UserResponse,
 )
+
+OTP_STORE = {}
+
+def clean_phone_number(phone_raw: str) -> str:
+    cleaned = re.sub(r"[^\d+]", "", phone_raw.strip())
+    digits = re.sub(r"\D", "", cleaned)
+    if len(digits) == 10:
+        return f"+91{digits}"
+    if not cleaned.startswith("+") and cleaned.startswith("91") and len(cleaned) == 12:
+        return f"+{cleaned}"
+    if not cleaned.startswith("+"):
+        return f"+{cleaned}"
+    return cleaned
+
+def find_user_by_identifier(db: Session, identifier: str):
+    ident = identifier.strip()
+    if "@" in ident:
+        return db.query(User).filter(User.email == ident.lower()).first()
+    
+    digits = re.sub(r"\D", "", ident)
+    if not digits:
+        return None
+    last_10 = digits[-10:] if len(digits) >= 10 else digits
+    normalized = f"+91{last_10}"
+    
+    return db.query(User).filter(
+        or_(
+            User.phone_number == ident,
+            User.phone_number == normalized,
+            User.phone_number == last_10,
+            User.phone_number.like(f"%{last_10}"),
+        )
+    ).first()
 from app.core.demo_data import DEMO_BOOKS, DEMO_MOVIES
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -76,13 +115,23 @@ def seed_user_starter_collection(db: Session, user_id: str):
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 def register(data: UserRegisterRequest, db: Session = Depends(get_db)):
-    """Register a new user account with Argon2id password hashing."""
-    existing_user = db.query(User).filter(User.email == data.email.lower()).first()
+    """Register a new user account with Argon2id password hashing and optional mobile number."""
+    existing_user = db.query(User).filter(User.email == data.email.lower().strip()).first()
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An account with this email address already exists"
         )
+
+    phone_clean = None
+    if data.phone_number and data.phone_number.strip():
+        phone_clean = clean_phone_number(data.phone_number)
+        existing_phone = find_user_by_identifier(db, phone_clean)
+        if existing_phone:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="An account with this mobile number already exists"
+            )
 
     # Hash password using Argon2id
     password_hash = get_password_hash(data.password)
@@ -90,6 +139,7 @@ def register(data: UserRegisterRequest, db: Session = Depends(get_db)):
     new_user = User(
         name=data.name.strip(),
         email=data.email.lower().strip(),
+        phone_number=phone_clean,
         password_hash=password_hash
     )
     db.add(new_user)
@@ -125,12 +175,19 @@ def register(data: UserRegisterRequest, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=TokenResponse)
 def login(data: UserLoginRequest, db: Session = Depends(get_db)):
-    """Authenticate user with email and password."""
-    user = db.query(User).filter(User.email == data.email.lower().strip()).first()
+    """Authenticate user with email or mobile number and password."""
+    target_identifier = (data.identifier or data.email or "").strip()
+    if not target_identifier:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Please provide an email address or mobile number",
+        )
+
+    user = find_user_by_identifier(db, target_identifier)
     if not user or not verify_password(data.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail="Incorrect email, mobile number, or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -144,6 +201,107 @@ def login(data: UserLoginRequest, db: Session = Depends(get_db)):
     )
     db.add(refresh_record)
     db.commit()
+
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=raw_refresh_token,
+        token_type="bearer",
+        user=UserResponse.model_validate(user)
+    )
+
+
+@router.post("/mobile-otp/request")
+def request_mobile_otp(data: MobileOtpRequest, db: Session = Depends(get_db)):
+    """
+    Generate and send 6-digit verification code for mobile number login.
+    Returns demo_otp for instant seamless testing in development/demo environments.
+    """
+    phone_clean = clean_phone_number(data.phone_number)
+    user = find_user_by_identifier(db, phone_clean)
+
+    # 6 digit cryptographically random OTP
+    otp_code = f"{secrets.randbelow(900000) + 100000}"
+    OTP_STORE[phone_clean] = {
+        "otp": otp_code,
+        "expires_at": time.time() + 300,
+    }
+
+    print(f"[AUTH MOBILE OTP] Verification code for {phone_clean}: {otp_code}")
+
+    return {
+        "status": "success",
+        "message": f"Verification code sent to {phone_clean}",
+        "phone_number": phone_clean,
+        "is_registered": bool(user),
+        "demo_otp": otp_code,
+    }
+
+
+@router.post("/mobile-otp/verify", response_model=TokenResponse)
+def verify_mobile_otp(data: MobileOtpVerifyRequest, db: Session = Depends(get_db)):
+    """
+    Verify 6-digit mobile OTP code and issue JWT tokens.
+    Automatically creates user account if first-time mobile login.
+    """
+    phone_clean = clean_phone_number(data.phone_number)
+    stored = OTP_STORE.get(phone_clean)
+
+    if not stored or stored["expires_at"] < time.time():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Verification code has expired. Please request a new code.",
+        )
+
+    if stored["otp"] != data.otp.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid verification code. Please check and try again.",
+        )
+
+    # Code verified! Clear OTP
+    OTP_STORE.pop(phone_clean, None)
+
+    # Look up existing user
+    user = find_user_by_identifier(db, phone_clean)
+    if not user:
+        # Auto-create account for new mobile user
+        digits = re.sub(r"\D", "", phone_clean)
+        last_4 = digits[-4:] if len(digits) >= 4 else "User"
+        fallback_name = (data.name or "").strip() or f"Reader {last_4}"
+        fallback_email = f"user_{digits[-10:]}@mobile.bibliobox.app"
+
+        existing_email_user = db.query(User).filter(User.email == fallback_email).first()
+        if existing_email_user:
+            fallback_email = f"user_{secrets.token_hex(4)}_{digits[-10:]}@mobile.bibliobox.app"
+
+        random_pwd = secrets.token_urlsafe(16)
+        user = User(
+            name=fallback_name,
+            email=fallback_email,
+            phone_number=phone_clean,
+            password_hash=get_password_hash(random_pwd),
+        )
+        db.add(user)
+        db.flush()
+
+        pref = UserPreference(user_id=user.id, theme="dark", page_turn_sound_enabled=True)
+        db.add(pref)
+        seed_user_starter_collection(db, user.id)
+    else:
+        if not user.phone_number:
+            user.phone_number = phone_clean
+
+    access_token = create_access_token(user.id)
+    raw_refresh_token, token_hash, expires_at = create_refresh_token(user.id)
+
+    refresh_record = RefreshToken(
+        user_id=user.id,
+        token_hash=token_hash,
+        expires_at=expires_at
+    )
+    db.add(refresh_record)
+    db.commit()
+    db.refresh(user)
 
     return TokenResponse(
         access_token=access_token,

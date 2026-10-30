@@ -10,7 +10,7 @@ export function AuthProvider({ children }) {
 
   const initAuth = async () => {
     const token = getStoredAccessToken();
-    const storedUser = localStorage.getItem('athenaeum_user');
+    const storedUser = localStorage.getItem('bibliobox_user') || localStorage.getItem('athenaeum_user');
     
     if (token) {
       if (storedUser) {
@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
       try {
         const userData = await authService.getMe();
         setUser(userData);
-        localStorage.setItem('athenaeum_user', JSON.stringify(userData));
+        localStorage.setItem('bibliobox_user', JSON.stringify(userData));
       } catch (err) {
         clearStoredTokens();
         setUser(null);
@@ -46,14 +46,24 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener('auth:expired', handleSessionExpired);
   }, []);
 
-  const login = async (email, password) => {
-    const data = await authService.login(email, password);
+  const login = async (identifier, password) => {
+    const data = await authService.login(identifier, password);
     setUser(data.user);
     return data.user;
   };
 
-  const register = async (name, email, password) => {
-    const data = await authService.register(name, email, password);
+  const loginWithMobileOtp = async (phone_number, otp, name = null) => {
+    const data = await authService.verifyMobileOtp(phone_number, otp, name);
+    setUser(data.user);
+    return data.user;
+  };
+
+  const requestMobileOtp = async (phone_number) => {
+    return await authService.requestMobileOtp(phone_number);
+  };
+
+  const register = async (name, email, password, phone_number = null) => {
+    const data = await authService.register(name, email, password, phone_number);
     setUser(data.user);
     return data.user;
   };
@@ -67,14 +77,24 @@ export function AuthProvider({ children }) {
     try {
       const userData = await authService.getMe();
       setUser(userData);
-      localStorage.setItem('athenaeum_user', JSON.stringify(userData));
+      localStorage.setItem('bibliobox_user', JSON.stringify(userData));
     } catch (e) {
       // ignore
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAuthenticated: !!user, login, register, logout, refreshUser }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      isAuthenticated: !!user, 
+      login, 
+      loginWithMobileOtp,
+      requestMobileOtp,
+      register, 
+      logout, 
+      refreshUser 
+    }}>
       {children}
     </AuthContext.Provider>
   );
