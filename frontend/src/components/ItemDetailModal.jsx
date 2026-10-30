@@ -12,7 +12,9 @@ import {
   FileText,
   BookmarkCheck,
   CheckCircle2,
-  Play
+  Play,
+  ExternalLink,
+  Link2
 } from 'lucide-react';
 
 export function ItemDetailModal({ 
@@ -171,8 +173,8 @@ export function ItemDetailModal({
                   </div>
                 </div>
               ) : (
-                /* Movie Watch Button */
-                <div className="mt-5">
+                /* Movie Watch & Stream Options */
+                <div className="mt-5 space-y-2.5">
                   <button
                     onClick={() => onWatchMovie?.(item)}
                     className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-md shadow-amber-600/30 hover:shadow-lg transition-all"
@@ -180,6 +182,26 @@ export function ItemDetailModal({
                     <Play className="w-4 h-4 fill-current" />
                     Watch Movie in Theater Player
                   </button>
+
+                  {movieDetails.video_url && (
+                    <div className="p-2.5 rounded-xl bg-cream-100 dark:bg-navy-950/70 border border-cream-200 dark:border-navy-800 flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
+                        <Link2 className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        <span className="truncate text-slate-500 dark:text-slate-400 font-mono text-[11px]" title={movieDetails.video_url}>
+                          {movieDetails.video_url}
+                        </span>
+                      </div>
+                      <a
+                        href={movieDetails.video_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-600 dark:text-amber-400 hover:underline shrink-0"
+                      >
+                        <span>Open Link</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  )}
                 </div>
               )}
 

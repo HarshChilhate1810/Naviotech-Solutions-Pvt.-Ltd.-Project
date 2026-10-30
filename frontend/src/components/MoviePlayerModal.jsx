@@ -33,17 +33,26 @@ export function MoviePlayerModal({ movie, onClose }) {
   const isVimeo = rawUrl.includes('vimeo.com');
 
   const getEmbedUrl = (url) => {
-    if (url.includes('youtu.be/')) {
-      const id = url.split('youtu.be/')[1]?.split('?')[0];
-      return `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
-    }
-    if (url.includes('watch?v=')) {
-      const id = url.split('watch?v=')[1]?.split('&')[0];
-      return `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
-    }
-    if (url.includes('vimeo.com/')) {
-      const id = url.split('vimeo.com/')[1]?.split('?')[0];
-      return `https://player.vimeo.com/video/${id}?autoplay=1`;
+    if (!url) return '';
+    try {
+      if (url.includes('youtu.be/')) {
+        const id = url.split('youtu.be/')[1]?.split('?')[0]?.split('&')[0];
+        return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+      }
+      if (url.includes('youtube.com/watch')) {
+        const id = url.split('v=')[1]?.split('&')[0]?.split('?')[0];
+        return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+      }
+      if (url.includes('youtube.com/embed/')) {
+        const id = url.split('embed/')[1]?.split('?')[0]?.split('&')[0];
+        return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+      }
+      if (url.includes('vimeo.com/')) {
+        const id = url.split('vimeo.com/')[1]?.split('?')[0];
+        return `https://player.vimeo.com/video/${id}?autoplay=1`;
+      }
+    } catch (e) {
+      console.debug('Error parsing embed url:', e);
     }
     return url;
   };
@@ -254,14 +263,29 @@ export function MoviePlayerModal({ movie, onClose }) {
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all hover:scale-105"
-            title="Close Player (Esc)"
-            aria-label="Close"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {rawUrl && (
+              <a
+                href={rawUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-medium backdrop-blur-md transition-all hover:scale-105"
+                title="Open video in external player or YouTube tab"
+              >
+                <ExternalLink className="w-3.5 h-3.5 text-amber-400" />
+                <span className="hidden sm:inline">{isYouTube ? 'Watch on YouTube' : 'External Stream'}</span>
+              </a>
+            )}
+
+            <button
+              onClick={onClose}
+              className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all hover:scale-105"
+              title="Close Player (Esc)"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Video Surface */}

@@ -1,4 +1,4 @@
-# Demo Starter Data with high-performance playable video streams and classic literature excerpts
+# Demo Starter Data with authentic YouTube cinema trailers and classic literature excerpts
 
 DEMO_MOVIES = [
     {
@@ -13,7 +13,7 @@ DEMO_MOVIES = [
         "movie": {
             "release_year": 2014,
             "director": "Christopher Nolan",
-            "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+            "video_url": "https://www.youtube.com/watch?v=zSWdZVtXT7E"
         }
     },
     {
@@ -28,7 +28,7 @@ DEMO_MOVIES = [
         "movie": {
             "release_year": 2010,
             "director": "Christopher Nolan",
-            "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+            "video_url": "https://www.youtube.com/watch?v=YoHD9XEInc0"
         }
     },
     {
@@ -43,7 +43,7 @@ DEMO_MOVIES = [
         "movie": {
             "release_year": 2008,
             "director": "Christopher Nolan",
-            "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
+            "video_url": "https://www.youtube.com/watch?v=EXeTwQWrcwY"
         }
     },
     {
@@ -58,7 +58,7 @@ DEMO_MOVIES = [
         "movie": {
             "release_year": 2001,
             "director": "Hayao Miyazaki",
-            "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+            "video_url": "https://www.youtube.com/watch?v=ByXuk9QqQkk"
         }
     },
     {
@@ -73,7 +73,7 @@ DEMO_MOVIES = [
         "movie": {
             "release_year": 2017,
             "director": "Denis Villeneuve",
-            "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+            "video_url": "https://www.youtube.com/watch?v=gCcx85zbxz4"
         }
     },
     {
@@ -88,7 +88,7 @@ DEMO_MOVIES = [
         "movie": {
             "release_year": 1999,
             "director": "Lana & Lilly Wachowski",
-            "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+            "video_url": "https://www.youtube.com/watch?v=vKQi3bBA1y8"
         }
     },
     {
@@ -103,7 +103,7 @@ DEMO_MOVIES = [
         "movie": {
             "release_year": 1994,
             "director": "Quentin Tarantino",
-            "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
+            "video_url": "https://www.youtube.com/watch?v=s7EdQ4FqbhY"
         }
     },
     {
@@ -118,7 +118,7 @@ DEMO_MOVIES = [
         "movie": {
             "release_year": 2016,
             "director": "Damien Chazelle",
-            "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4"
+            "video_url": "https://www.youtube.com/watch?v=0pdqf4P9MB8"
         }
     },
     {
@@ -133,7 +133,7 @@ DEMO_MOVIES = [
         "movie": {
             "release_year": 2021,
             "director": "Alastair Fothergill",
-            "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4"
+            "video_url": "https://www.youtube.com/watch?v=c8aFcHFu8QM"
         }
     },
     {
@@ -148,7 +148,7 @@ DEMO_MOVIES = [
         "movie": {
             "release_year": 2020,
             "director": "David Carson",
-            "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4"
+            "video_url": "https://www.youtube.com/watch?v=4TshFZY0714"
         }
     }
 ]
@@ -271,4 +271,3 @@ Our chairs, being his patents, embraced and caressed us rather than submitted to
         }
     }
 ]
-

@@ -256,38 +256,38 @@ export function ItemFormModal({
                   <span className="text-[11px] text-cream-800/60 dark:text-slate-400">Stream Presets:</span>
                   <button
                     type="button"
+                    onClick={() => setVideoUrl('https://www.youtube.com/watch?v=zSWdZVtXT7E')}
+                    className="px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-cream-100 dark:bg-navy-800 text-cream-800 dark:text-slate-300 hover:bg-amber-500/20 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+                  >
+                    Interstellar (YouTube)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setVideoUrl('https://www.youtube.com/watch?v=YoHD9XEInc0')}
+                    className="px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-cream-100 dark:bg-navy-800 text-cream-800 dark:text-slate-300 hover:bg-amber-500/20 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+                  >
+                    Inception (YouTube)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setVideoUrl('https://www.youtube.com/watch?v=EXeTwQWrcwY')}
+                    className="px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-cream-100 dark:bg-navy-800 text-cream-800 dark:text-slate-300 hover:bg-amber-500/20 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+                  >
+                    Dark Knight (YouTube)
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setVideoUrl('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')}
                     className="px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-cream-100 dark:bg-navy-800 text-cream-800 dark:text-slate-300 hover:bg-amber-500/20 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
                   >
-                    Tears of Steel (Sci-Fi)
+                    Tears of Steel (MP4)
                   </button>
                   <button
                     type="button"
                     onClick={() => setVideoUrl('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')}
                     className="px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-cream-100 dark:bg-navy-800 text-cream-800 dark:text-slate-300 hover:bg-amber-500/20 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
                   >
-                    Big Buck Bunny (Animation)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setVideoUrl('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')}
-                    className="px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-cream-100 dark:bg-navy-800 text-cream-800 dark:text-slate-300 hover:bg-amber-500/20 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
-                  >
-                    Sintel (Fantasy)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setVideoUrl('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4')}
-                    className="px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-cream-100 dark:bg-navy-800 text-cream-800 dark:text-slate-300 hover:bg-amber-500/20 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
-                  >
-                    Blazes (Action)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setVideoUrl('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4')}
-                    className="px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-cream-100 dark:bg-navy-800 text-cream-800 dark:text-slate-300 hover:bg-amber-500/20 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
-                  >
-                    Wonders (Documentary)
+                    Big Buck Bunny (MP4)
                   </button>
                 </div>
               </div>
