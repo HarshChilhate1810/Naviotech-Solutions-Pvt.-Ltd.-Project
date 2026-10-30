@@ -1,3 +1,4 @@
+from app.core.demo_data import DEMO_MOVIES
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import or_, desc, asc, func
@@ -376,3 +377,78 @@ def update_reading_progress(
     db.commit()
     db.refresh(item)
     return LibraryItemResponse.model_validate(item)
+
+
+@router.post("/seed-demo-movies")
+def seed_demo_movies(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Populates or updates high-quality playable demo movies for the authenticated user
+    so their movie theater is rich and immediately playable.
+    """
+    added_count = 0
+    updated_count = 0
+
+    for demo in DEMO_MOVIES:
+        existing = (
+            db.query(LibraryItem)
+            .options(joinedload(LibraryItem.movie_details))
+            .filter(
+                LibraryItem.user_id == current_user.id,
+                LibraryItem.item_type == "movie",
+                func.lower(LibraryItem.title) == demo["title"].lower(),
+            )
+            .first()
+        )
+
+        m_info = demo["movie"]
+
+        if existing:
+            if not existing.movie_details:
+                existing.movie_details = MovieDetail(
+                    item_id=existing.id,
+                    release_year=m_info.get("release_year"),
+                    director=m_info.get("director"),
+                    video_url=m_info.get("video_url"),
+                )
+            else:
+                existing.movie_details.video_url = m_info.get("video_url")
+                existing.movie_details.director = m_info.get("director")
+                existing.movie_details.release_year = m_info.get("release_year")
+            existing.cover_image_url = demo["cover_image_url"]
+            existing.description = demo["description"]
+            updated_count += 1
+        else:
+            new_item = LibraryItem(
+                user_id=current_user.id,
+                item_type="movie",
+                title=demo["title"],
+                genre=demo["genre"],
+                rating=demo["rating"],
+                description=demo["description"],
+                cover_image_url=demo["cover_image_url"],
+                is_favorite=demo["is_favorite"],
+                personal_notes=demo["personal_notes"],
+            )
+            db.add(new_item)
+            db.flush()
+
+            movie_detail = MovieDetail(
+                item_id=new_item.id,
+                release_year=m_info.get("release_year"),
+                director=m_info.get("director"),
+                video_url=m_info.get("video_url"),
+            )
+            db.add(movie_detail)
+            added_count += 1
+
+    db.commit()
+    return {
+        "status": "success",
+        "message": f"Demo movies synchronized: {added_count} added, {updated_count} updated",
+        "added": added_count,
+        "updated": updated_count,
+        "total_demo_movies": len(DEMO_MOVIES),
+    }

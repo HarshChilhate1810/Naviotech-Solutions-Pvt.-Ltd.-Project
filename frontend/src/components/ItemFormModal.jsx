@@ -275,6 +275,20 @@ export function ItemFormModal({
                   >
                     Sintel (Fantasy)
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => setVideoUrl('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4')}
+                    className="px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-cream-100 dark:bg-navy-800 text-cream-800 dark:text-slate-300 hover:bg-amber-500/20 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+                  >
+                    Blazes (Action)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setVideoUrl('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4')}
+                    className="px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-cream-100 dark:bg-navy-800 text-cream-800 dark:text-slate-300 hover:bg-amber-500/20 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+                  >
+                    Wonders (Documentary)
+                  </button>
                 </div>
               </div>
             </div>

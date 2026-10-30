@@ -58,4 +58,10 @@ export const libraryService = {
       body: JSON.stringify({ current_page, reading_status }),
     });
   },
+
+  async seedDemoMovies() {
+    return await apiRequest('/library-items/seed-demo-movies', {
+      method: 'POST',
+    });
+  },
 };

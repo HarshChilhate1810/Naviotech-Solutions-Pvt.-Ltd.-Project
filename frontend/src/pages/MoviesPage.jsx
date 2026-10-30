@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { Film, Plus, RefreshCw, Layers } from 'lucide-react';
+import { Film, Plus, RefreshCw, Layers, Sparkles, Check } from 'lucide-react';
 import { libraryService } from '../services/libraryService';
 import { useDebounce } from '../hooks/useDebounce';
 import { FilterBar } from '../components/FilterBar';
@@ -37,7 +37,8 @@ export function MoviesPage() {
   const [deletingItem, setDeletingItem] = useState(null);
   const [watchingMovie, setWatchingMovie] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-
+  const [seeding, setSeeding] = useState(false);
+  const [seedSuccess, setSeedSuccess] = useState(false);
 
   // Load movies from backend
   const fetchMovies = useCallback(async () => {
@@ -64,6 +65,21 @@ export function MoviesPage() {
       setLoading(false);
     }
   }, [debouncedSearch, genre, rating, isFavorite, sortBy, page]);
+
+  // Seed / Sync playable demo movies
+  const handleSeedDemoMovies = async () => {
+    try {
+      setSeeding(true);
+      await libraryService.seedDemoMovies();
+      setSeedSuccess(true);
+      await fetchMovies();
+      setTimeout(() => setSeedSuccess(false), 3000);
+    } catch (err) {
+      console.error('Failed to seed demo movies:', err);
+    } finally {
+      setSeeding(false);
+    }
+  };
 
   // Reset to page 1 when filters change
   useEffect(() => {
@@ -142,13 +158,35 @@ export function MoviesPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => handleOpenAdd?.('movie')}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-sm shadow-amber-600/30 transition-all"
-        >
-          <Plus className="w-4 h-4" />
-          Add Movie
-        </button>
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={handleSeedDemoMovies}
+            disabled={seeding}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border text-xs font-semibold transition-all ${
+              seedSuccess
+                ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
+                : 'bg-cream-100 hover:bg-cream-200/80 dark:bg-navy-900 dark:hover:bg-navy-800 border-cream-200 dark:border-navy-700 text-cream-900 dark:text-white shadow-xs'
+            }`}
+            title="Load playable cinema demo movies"
+          >
+            {seeding ? (
+              <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-500" />
+            ) : seedSuccess ? (
+              <Check className="w-3.5 h-3.5 text-emerald-500" />
+            ) : (
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            )}
+            <span>{seeding ? 'Loading...' : seedSuccess ? 'Movies Synced!' : 'Load Demo Movies'}</span>
+          </button>
+
+          <button
+            onClick={() => handleOpenAdd?.('movie')}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-sm shadow-amber-600/30 transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            Add Movie
+          </button>
+        </div>
       </div>
 
       {/* Filter and Search Bar */}
@@ -220,12 +258,22 @@ export function MoviesPage() {
                 Clear All Filters
               </button>
             ) : (
-              <button
-                onClick={() => handleOpenAdd?.('movie')}
-                className="px-4 py-2 rounded-xl bg-amber-600 text-white text-xs font-bold shadow-sm"
-              >
-                Add Your First Movie
-              </button>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <button
+                  onClick={handleSeedDemoMovies}
+                  disabled={seeding}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-sm shadow-amber-600/30 transition-all"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  {seeding ? 'Loading Demo Movies...' : 'Load Playable Demo Movies'}
+                </button>
+                <button
+                  onClick={() => handleOpenAdd?.('movie')}
+                  className="px-4 py-2 rounded-xl bg-cream-200 dark:bg-navy-800 text-cream-900 dark:text-white text-xs font-semibold hover:bg-cream-300 dark:hover:bg-navy-700 transition-colors"
+                >
+                  Add Custom Movie
+                </button>
+              </div>
             )}
           </div>
         </div>
