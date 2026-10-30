@@ -1,6 +1,6 @@
-# Athenaeum — Movie & Book Library Web Application
+# Naviotech Solutions — Movie & Book Library (BiblioBox)
 
-> A modern, secure, and attractive full-stack web application allowing users to curate personal movie and book collections, filter and search items, manage ratings and reviews, and read books through a **realistic interactive 3D book reader** with synthesized physical page-turn acoustics and cross-device PostgreSQL progress syncing.
+> A modern, secure, and responsive full-stack web application developed for Naviotech Solutions Pvt. Ltd., allowing users to curate personal movie and book collections, filter and search items, manage ratings and reviews, stream cinema, and read books through an authentic interactive 3D book reader with physical paper-turn acoustics and cross-device progress synchronization.
 
 ---
 
