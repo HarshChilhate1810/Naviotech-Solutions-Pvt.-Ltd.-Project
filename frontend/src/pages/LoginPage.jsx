@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, LogIn, Sparkles, ArrowRight } from 'lucide-react';
+import { Mail, Lock, LogIn } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export function LoginPage() {
@@ -9,7 +9,6 @@ export function LoginPage() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -30,12 +29,6 @@ export function LoginPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Demo user helper to test seamlessly
-  const fillDemoUser = () => {
-    setEmail('jane@example.com');
-    setPassword('Password123!');
   };
 
   return (
@@ -114,20 +107,8 @@ export function LoginPage() {
 
       </form>
 
-      {/* Demo Credentials Quick-Fill button */}
-      <div className="mt-5 pt-4 border-t border-cream-100 dark:border-navy-800">
-        <button
-          type="button"
-          onClick={fillDemoUser}
-          className="w-full py-2 px-3 rounded-xl bg-cream-100 dark:bg-navy-950 hover:bg-cream-200 dark:hover:bg-navy-850 text-cream-800 dark:text-slate-300 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
-        >
-          <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-          Auto-fill Demo Credentials (jane@example.com)
-        </button>
-      </div>
-
       {/* Footer link to sign up */}
-      <div className="mt-5 text-center">
+      <div className="mt-6 pt-5 border-t border-cream-100 dark:border-navy-800 text-center">
         <p className="text-xs text-cream-800/70 dark:text-slate-400">
           Don't have an account yet?{' '}
           <Link
