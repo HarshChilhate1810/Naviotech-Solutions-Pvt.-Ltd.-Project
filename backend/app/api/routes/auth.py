@@ -66,6 +66,7 @@ def find_user_by_identifier(db: Session, identifier: str):
         )
     ).first()
 from app.core.demo_data import DEMO_BOOKS, DEMO_MOVIES
+from app.services.sms_service import send_sms_otp
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -228,11 +229,18 @@ def request_mobile_otp(data: MobileOtpRequest, db: Session = Depends(get_db)):
 
     print(f"[AUTH MOBILE OTP] Verification code for {phone_clean}: {otp_code}")
 
+    # Dispatch via SMS Service (Fast2SMS / Twilio / 2Factor / Webhook)
+    sms_result = send_sms_otp(phone_clean, otp_code)
+
     return {
         "status": "success",
-        "message": f"Verification code sent to {phone_clean}",
+        "message": sms_result.get("message") or f"Verification code sent to {phone_clean}",
         "phone_number": phone_clean,
         "is_registered": bool(user),
+        "sms_delivered": sms_result.get("sent", False),
+        "sms_provider": sms_result.get("provider", "sandbox"),
+        "sms_error": sms_result.get("error"),
+        "setup_guide": sms_result.get("setup_guide"),
         "demo_otp": otp_code,
     }
 

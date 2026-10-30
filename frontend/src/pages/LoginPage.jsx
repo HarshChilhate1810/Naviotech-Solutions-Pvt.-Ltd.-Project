@@ -21,6 +21,8 @@ export function LoginPage() {
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [demoOtp, setDemoOtp] = useState('');
+  const [smsDelivered, setSmsDelivered] = useState(false);
+  const [smsProvider, setSmsProvider] = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
 
   const [loading, setLoading] = useState(false);
@@ -81,8 +83,14 @@ export function LoginPage() {
       const res = await requestMobileOtp(clean);
       setOtpSent(true);
       setDemoOtp(res.demo_otp || '');
+      setSmsDelivered(Boolean(res.sms_delivered));
+      setSmsProvider(res.sms_provider || '');
       setResendCooldown(45);
-      setInfoMessage(`Verification code sent to +91 ${clean.slice(-10)}`);
+      if (res.sms_delivered) {
+        setInfoMessage(`📱 Real SMS verification code dispatched to +91 ${clean.slice(-10)} via ${res.sms_provider?.toUpperCase()}! Check your phone.`);
+      } else {
+        setInfoMessage(`Verification code generated for +91 ${clean.slice(-10)}`);
+      }
     } catch (err) {
       setError(err.message || 'Failed to send OTP code. Please try again.');
     } finally {
@@ -323,33 +331,63 @@ export function LoginPage() {
             <>
               {!otpSent ? (
                 /* Step 1: Request OTP */
-                <button
-                  type="button"
-                  onClick={handleRequestOtp}
-                  disabled={loading || getCleanMobile().length < 10}
-                  className="w-full mt-2 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold tracking-wide uppercase shadow-md shadow-amber-600/30 hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  <Smartphone className="w-4 h-4" />
-                  {loading ? 'Sending Verification Code...' : 'Send OTP Code'}
-                </button>
+                <div>
+                  <button
+                    type="button"
+                    onClick={handleRequestOtp}
+                    disabled={loading || getCleanMobile().length < 10}
+                    className="w-full mt-2 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold tracking-wide uppercase shadow-md shadow-amber-600/30 hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    <Smartphone className="w-4 h-4" />
+                    {loading ? 'Sending Verification Code...' : 'Send OTP Code'}
+                  </button>
+                  <p className="text-[11px] text-center text-slate-400 dark:text-slate-500 mt-2">
+                    Real SMS delivered to mobile phone (Fast2SMS / Twilio). Valid for 5 mins.
+                  </p>
+                </div>
               ) : (
                 /* Step 2: Enter & Verify OTP */
                 <form onSubmit={handleVerifyOtp} className="space-y-4 animate-in fade-in">
                   
-                  {/* Demo/Dev OTP Notification Helper */}
-                  {demoOtp && (
-                    <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-xs text-amber-800 dark:text-amber-300">
-                        <KeyRound className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                        <span>Verification Code: <strong className="font-mono text-sm tracking-widest">{demoOtp}</strong></span>
+                  {/* Live SMS Delivery Confirmation */}
+                  {smsDelivered && (
+                    <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-start gap-3">
+                      <div className="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                        <CheckCircle2 className="w-4 h-4" />
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => setOtp(demoOtp)}
-                        className="px-2.5 py-1 rounded-lg bg-amber-600 text-white text-[10px] font-bold shadow-xs hover:bg-amber-500 transition-colors"
-                      >
-                        Auto Fill
-                      </button>
+                      <div className="flex-1 text-xs">
+                        <div className="font-bold text-emerald-800 dark:text-emerald-300">
+                          Real SMS Delivered to Mobile Phone
+                        </div>
+                        <p className="text-[11px] text-emerald-700/80 dark:text-emerald-300/80 mt-0.5 leading-relaxed">
+                          OTP verification code sent via SMS to <strong>+91 {getCleanMobile().slice(-10)}</strong> via <strong>{smsProvider?.toUpperCase()}</strong> Gateway. Please check your SMS inbox.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Dev/Sandbox OTP Helper Banner */}
+                  {!smsDelivered && demoOtp && (
+                    <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-xs text-amber-800 dark:text-amber-300">
+                          <KeyRound className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                          <span>Sandbox Test Code: <strong className="font-mono text-sm tracking-widest">{demoOtp}</strong></span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setOtp(demoOtp)}
+                          className="px-2.5 py-1 rounded-lg bg-amber-600 text-white text-[10px] font-bold shadow-xs hover:bg-amber-500 transition-colors"
+                        >
+                          Auto Fill
+                        </button>
+                      </div>
+                      <div className="pt-2 border-t border-amber-500/20 text-[11px] text-amber-900/70 dark:text-amber-300/70 flex items-start gap-1.5">
+                        <Smartphone className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                        <span>
+                          <strong>Real SMS on Phone:</strong> Configure <code className="font-mono text-[10px] bg-amber-200/50 dark:bg-amber-900/40 px-1 py-0.5 rounded">FAST2SMS_API_KEY</code> or Twilio in <code className="font-mono text-[10px] bg-amber-200/50 dark:bg-amber-900/40 px-1 py-0.5 rounded">backend/.env</code> to receive live SMS on your mobile phone.
+                        </span>
+                      </div>
                     </div>
                   )}
 

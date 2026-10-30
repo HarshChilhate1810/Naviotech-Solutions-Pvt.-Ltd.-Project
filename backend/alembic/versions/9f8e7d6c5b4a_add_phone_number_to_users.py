@@ -29,3 +29,4 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.drop_index(op.f('ix_users_phone_number'), table_name='users')
     op.drop_column('users', 'phone_number')
+

@@ -1,5 +1,5 @@
 import os
-from typing import List, Union
+from typing import List, Union, Optional
 from pydantic import AnyHttpUrl, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -30,6 +30,16 @@ class Settings(BaseSettings):
         "http://localhost:3000",
         "http://127.0.0.1:3000",
     ]
+
+    # SMS Gateway Configuration for Real Mobile Number OTP Delivery
+    # Providers supported: Fast2SMS (India), Twilio (Global), 2Factor.in (India), Custom Webhook
+    SMS_PROVIDER: str = os.getenv("SMS_PROVIDER", "auto")
+    FAST2SMS_API_KEY: str = os.getenv("FAST2SMS_API_KEY", "")
+    TWILIO_ACCOUNT_SID: str = os.getenv("TWILIO_ACCOUNT_SID", "")
+    TWILIO_AUTH_TOKEN: str = os.getenv("TWILIO_AUTH_TOKEN", "")
+    TWILIO_FROM_NUMBER: str = os.getenv("TWILIO_FROM_NUMBER", "")
+    TWO_FACTOR_API_KEY: str = os.getenv("TWO_FACTOR_API_KEY", "")
+    SMS_WEBHOOK_URL: str = os.getenv("SMS_WEBHOOK_URL", "")
 
     model_config = SettingsConfigDict(
         env_file=".env",
