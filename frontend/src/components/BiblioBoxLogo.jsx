@@ -103,3 +103,4 @@ export function BiblioBoxLogo({ className = 'w-8 h-8', showText = false, textCla
     </div>
   );
 }
+
